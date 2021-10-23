@@ -9,28 +9,27 @@ Created on Sat Oct 23 14:24:42 2021
 import datetime
 import hashlib
 import json
-from flask import Flask, jsonify
 
 
 # Building a Blockchain
 class Blockchian:
     def __init__(self):
-        self.chain = []
+        self.blockchain = []
         self.create_block(proof=1, previous_hash='0')
         
     def create_block(self, proof, previous_hash):
         block = {
-            'index': len(self.chain) + 1,
+            'index': len(self.blockchain) + 1,
             'timestamp': str(datetime.datetime.now()),
             'proof': proof,
             'previous_hash': previous_hash
             }
         
-        self.chain.append(block)
+        self.blockchain.append(block)
         return block
     
     def get_previous_block(self):
-        return self.chain[-1]
+        return self.blockchain[-1]
     
     def proof_of_work(self, previous_proof):
         new_proof = 1
@@ -48,12 +47,12 @@ class Blockchian:
         encoded_block = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
     
-    def is_chain_valid(self, chain):
-        previous_block = chain[0]
+    def is_blockchain_valid(self, blockchain):
+        previous_block = blockchain[0]
         block_index = 1
-        while block_index < len(chain):
+        while block_index < len(blockchain):
             # Checking whole blockchain hashes
-            block = chain[block_index]
+            block = blockchain[block_index]
             if block['previous_hash'] != self.block_hash(previous_block):
                 return False
             # Checking proof of blockchain
