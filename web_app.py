@@ -28,13 +28,13 @@ def mine_block() -> Tuple["Response", int]:
         a related HTTP code.
     """
     previous_block = blockchain.get_previous_block()
-    proof = Blockchain.proof_of_work(previous_block['proof'])
-    block = blockchain.create_block(proof,
+    nonce = Blockchain.proof_of_work(previous_block['nonce'])
+    block = blockchain.create_block(nonce,
                                     Blockchain.block_hash(previous_block))
     response = {'message': 'The block mined successfully',
                 'index': block['index'],
                 'timestamp': block['timestamp'],
-                'proof': block['proof'],
+                'nonce': block['nonce'],
                 'hash': blockchain.block_hash(block),
                 'previous_hash': block['previous_hash']}
 

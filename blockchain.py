@@ -18,13 +18,13 @@ class Blockchain:
 
     def __init__(self) -> None:
         self.blockchain: List = []
-        self.create_block(proof=1, previous_hash='0')
+        self.create_block(nonce=1, previous_hash='0')
 
-    def create_block(self, proof: int, previous_hash: str) -> Dict:
+    def create_block(self, nonce: int, previous_hash: str) -> Dict:
         """This method create a block and add it to the blockchain
 
         Args:
-            proof (int): proof of work
+            nonce (int): nonce of work
             previous_hash (str): prevoius block hash
 
         Returns:
@@ -34,7 +34,7 @@ class Blockchain:
         block = {
             'index': len(self.blockchain) + 1,
             'timestamp': str(datetime.datetime.now()),
-            'proof': proof,
+            'nonce': nonce,
             'previous_hash': previous_hash
         }
 
@@ -46,25 +46,25 @@ class Blockchain:
         return self.blockchain[-1]
 
     @staticmethod
-    def proof_of_work(previous_proof: int) -> int:
+    def proof_of_work(previous_nonce: int) -> int:
         """Proof of work mechanism implemented here.
 
         Args:
-            previous_proof (int): proof of previous block
+            previous_nonce (int): nonce of previous block
 
         Returns:
-            new_proof (int): proof of new block
+            new_nonce (int): nonce of new block
         """
-        new_proof = 1
+        new_nonce = 1
         check_proof = False
         while check_proof is False:
             hash_operation = hashlib.sha256(
-                str(new_proof**2 - previous_proof**2).encode()).hexdigest()
+                str(new_nonce**2 - previous_nonce**2).encode()).hexdigest()
             if hash_operation[:4] == '0000':
                 check_proof = True
             else:
-                new_proof += 1
-        return new_proof
+                new_nonce += 1
+        return new_nonce
 
     @staticmethod
     def block_hash(block: Dict) -> str:
@@ -96,12 +96,12 @@ class Blockchain:
             block = blockchain[block_index]
             if block['previous_hash'] != self.block_hash(previous_block):
                 return False
-            # Checking proof of blockchain
-            previous_proof = previous_block['proof']
-            current_proof = block['proof']
-            # Recalcaulate the proof for checking validity
+            # Checking the blockchain proof of work
+            previous_nonce = previous_block['nonce']
+            current_nonce = block['nonce']
+            # Recalcaulate the nonce for checking validity
             hash_operation = hashlib.sha256(
-                str(current_proof**2 - previous_proof**2).encode()).hexdigest()
+                str(current_nonce**2 - previous_nonce**2).encode()).hexdigest()
             if hash_operation[:4] != '0000':
                 return False
             previous_block = block
