@@ -113,7 +113,17 @@ class Blockchain:
             previous_block = block
             block_index += 1
 
-    def add_transaction(self, sender, receiver, amount) -> int:
+    def add_transaction(self, sender: str, receiver: str, amount: int) -> int:
+        """Add transaction to blockchain
+
+        Args:
+            sender (str): Sender of the coin
+            receiver (str): Receiver of the coin
+            amount (int): Amount of coin to be sent
+
+        Returns:
+            int: [description]
+        """
         self.transactions.append({
             'sender': sender,
             'receiver': receiver,
@@ -121,8 +131,6 @@ class Blockchain:
         })
         previous_block = self.get_previous_block()
         return previous_block['index'] + 1
-
-        return True
 
     def add_node(self, node_address: str) -> None:
         """Add node to nodes' network used by blockchain
