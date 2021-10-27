@@ -9,7 +9,10 @@ Created on Sat Oct 23 14:24:42 2021
 import datetime
 import hashlib
 import json
-from typing import Dict, List
+import requests
+from urllib.parse import urlparse
+from uuid import uuid4
+from typing import Dict, List, Set
 
 
 # Building a Blockchain
@@ -20,6 +23,7 @@ class Blockchain:
         self.blockchain: List = []
         self.transactions: List = []
         self.create_block(nonce=1, previous_hash='0')
+        self.nodes: Set = set()
 
     def create_block(self, nonce: int, previous_hash: str) -> Dict:
         """This method create a block and add it to the blockchain
@@ -109,7 +113,6 @@ class Blockchain:
             previous_block = block
             block_index += 1
 
-    # TODO: Add type to input
     def add_transaction(self, sender, receiver, amount) -> int:
         self.transactions.append({
             'sender': sender,
@@ -120,3 +123,35 @@ class Blockchain:
         return previous_block['index'] + 1
 
         return True
+
+    def add_node(self, node_address: str) -> None:
+        """Add node to nodes' network used by blockchain
+
+        Args:
+            node_address (str): Address of node
+        """
+        parsed_url = urlparse(node_address)
+        self.nodes.add(parsed_url.netloc)
+
+    def consensus_protocol(self) -> bool:
+        """Consensus Protocol implementaion by replacing longest valid chain
+
+        Returns:
+            bool: Returns True if any chain replacement happens
+        """
+        longest_chain = None
+        chain_max_length = len(self.blockchain)
+        for node in self.nodes:
+            response = requests.get(f'http://{node}/get_blockchain/')
+            length = response.json()['length']
+            chain = response.json()['blockchain']
+            if response.status_code == 200:
+                if length > chain_max_length and \
+                        self.is_blockchain_valid(chain):
+                    chain_max_length = length
+                    longest_chain = chain
+
+        if longest_chain:
+            self.chain = longest_chain
+            return True
+        return False
