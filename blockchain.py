@@ -113,6 +113,8 @@ class Blockchain:
             previous_block = block
             block_index += 1
 
+            return True
+
     def add_transaction(self, sender: str, receiver: str, amount: int) -> int:
         """Add transaction to blockchain
 
@@ -150,16 +152,16 @@ class Blockchain:
         longest_chain = None
         chain_max_length = len(self.blockchain)
         for node in self.nodes:
-            response = requests.get(f'http://{node}/get_blockchain/')
-            length = response.json()['length']
-            chain = response.json()['blockchain']
+            response = requests.get(f'http://{node}/get_blockchain')
             if response.status_code == 200:
+                length = response.json()['length']
+                chain = response.json()['blockchain']
                 if length > chain_max_length and \
                         self.is_blockchain_valid(chain):
                     chain_max_length = length
                     longest_chain = chain
 
         if longest_chain:
-            self.chain = longest_chain
+            self.blockchain = longest_chain
             return True
         return False
